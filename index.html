@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LIAA · Priscila Schafhauzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:   #1B3A6B;
+  --navy2:  #122850;
+  --orange: #E8670A;
+  --orange2:#C4530A;
+  --white:  #FFFFFF;
+  --gray1:  #F4F6FA;
+  --gray2:  #E2E8F0;
+  --gray3:  #94A3B8;
+  --gray4:  #475569;
+  --text:   #1E293B;
+  --green:  #16A34A;
+  --yellow: #F5A623;
+  --mono:   'JetBrains Mono', monospace;
+  --sans:   'Inter', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --gray1: #0F172A;
+    --gray2: #1E293B;
+    --gray3: #64748B;
+    --gray4: #94A3B8;
+    --text:  #E2E8F0;
+    --white: #FFFFFF;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: var(--sans);
+  background: var(--navy2);
+  color: var(--white);
+  line-height: 1.6;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: env(safe-area-inset-top, 0);
+  left: 0; right: 0;
+  z-index: 100;
+  background: rgba(18, 40, 80, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(232,103,10,0.3);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.nav-brand {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--orange);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+}
+
+.nav-links a {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--orange); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  padding: calc(60px + env(safe-area-inset-top, 0px) + 4rem) 2rem 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--navy2) 0%, #0D1F40 60%, #1a1035 100%);
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%; left: -20%;
+  width: 70%; height: 100%;
+  background: radial-gradient(ellipse, rgba(232,103,10,0.08) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%; right: -10%;
+  width: 50%; height: 70%;
+  background: radial-gradient(ellipse, rgba(27,58,107,0.4) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--orange);
+  letter-spacing: 0.12em;
+  margin-bottom: 1.5rem;
+  opacity: 0.9;
+}
+
+.hero h1 {
+  font-size: clamp(1.9rem, 5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.15;
+  max-width: 820px;
+  margin-bottom: 1.25rem;
+}
+
+.hero h1 span { color: var(--orange); }
+
+.hero-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.65);
+  max-width: 580px;
+  margin-bottom: 2.5rem;
+  line-height: 1.7;
+}
+
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 3rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.05);
+}
+
+.badge.orange {
+  border-color: rgba(232,103,10,0.5);
+  color: var(--orange);
+  background: rgba(232,103,10,0.08);
+}
+
+.hero-stats {
+  display: flex;
+  gap: 3rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stat { text-align: center; }
+.stat-num {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--orange);
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+/* ── SECTIONS ── */
+section {
+  padding: 5rem 2rem;
+}
+
+.section-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--orange);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  line-height: 1.25;
+}
+
+.section-body {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.8;
+  max-width: 680px;
+}
+
+/* ── ALTERNATING BG ── */
+.bg-dark  { background: var(--navy2); }
+.bg-mid   { background: #0D1F40; }
+.bg-light { background: rgba(27,58,107,0.25); }
+
+/* ── CARDS ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.card:hover {
+  border-color: rgba(232,103,10,0.4);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.9rem;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--white);
+}
+
+.card-text {
+  font-size: 0.83rem;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.65;
+}
+
+/* ── RQ CARDS ── */
+.rq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.rq-item {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+}
+
+.rq-num {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--orange);
+  min-width: 32px;
+  padding-top: 2px;
+}
+
+.rq-content {}
+.rq-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+.rq-desc  { font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.6; }
+.rq-metric {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--orange);
+  margin-top: 0.4rem;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  position: relative;
+  margin-top: 2.5rem;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 7px; top: 8px; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--orange), rgba(232,103,10,0.1));
+}
+
+.tl-item {
+  position: relative;
+  margin-bottom: 2rem;
+}
+
+.tl-dot {
+  position: absolute;
+  left: -1.95rem;
+  top: 5px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--orange);
+  background: var(--navy2);
+}
+
+.tl-dot.done { background: var(--orange); }
+.tl-dot.current { background: var(--yellow); border-color: var(--yellow); box-shadow: 0 0 8px rgba(245,166,35,0.5); }
+
+.tl-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.tl-tag {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.tl-tag.done    { background: rgba(22,163,74,0.15); color: #4ADE80; border: 1px solid rgba(22,163,74,0.3); }
+.tl-tag.current { background: rgba(245,166,35,0.15); color: var(--yellow); border: 1px solid rgba(245,166,35,0.3); }
+.tl-tag.next    { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
+
+.tl-title { font-size: 0.9rem; font-weight: 600; }
+.tl-desc  { font-size: 0.82rem; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+/* ── RESULTS ── */
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.result-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.result-pct {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.result-pct.green  { color: #4ADE80; }
+.result-pct.orange { color: var(--orange); }
+.result-pct.yellow { color: var(--yellow); }
+.result-pct.red    { color: #F87171; }
+
+.result-crit { font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; }
+.result-desc { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.5; }
+
+/* ── HIGHLIGHT BOX ── */
+.highlight {
+  background: rgba(232,103,10,0.08);
+  border: 1px solid rgba(232,103,10,0.25);
+  border-left: 3px solid var(--orange);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 2rem;
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.7;
+}
+
+.highlight strong { color: var(--orange); }
+
+/* ── REPO CARD ── */
+.repo-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  margin-top: 2rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+
+.repo-card:hover { border-color: rgba(232,103,10,0.5); }
+
+.repo-icon { font-size: 2rem; }
+.repo-info {}
+.repo-name { font-size: 0.95rem; font-weight: 600; color: var(--orange); margin-bottom: 0.25rem; }
+.repo-desc { font-size: 0.82rem; color: rgba(255,255,255,0.5); }
+
+/* ── FOOTER ── */
+footer {
+  background: #080F1E;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  padding-bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+.footer-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.4rem; }
+.footer-meta { font-size: 0.78rem; color: rgba(255,255,255,0.35); line-height: 1.8; }
+.footer-meta a { color: var(--orange); text-decoration: none; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  nav { padding: 0 1rem; }
+  .nav-links { gap: 1rem; }
+  section { padding: 3.5rem 1.25rem; }
+  .hero { padding-left: 1.25rem; padding-right: 1.25rem; }
+  .hero-stats { gap: 1.5rem; }
+  .repo-card { flex-direction: column; text-align: center; }
+  .tl-desc { font-size: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">LIAA · Priscila Schafhauzer</span>
+  <ul class="nav-links">
+    <li><a href="#contexto">Contexto</a></li>
+    <li><a href="#proposta">Proposta</a></li>
+    <li><a href="#evolucao">Evolução</a></li>
+    <li><a href="#resultados">Resultados</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">PPGES · UNIPAMPA · LIAA · 2026</p>
+  <h1>Avaliação da Qualidade de Regras de Detecção <span>SIEM</span> com LLMs</h1>
+  <p class="hero-sub">Investigando se modelos de linguagem conseguem avaliar regras de detecção de intrusão com a mesma qualidade de um especialista humano.</p>
+  <div class="hero-badges">
+    <span class="badge orange">LLM-as-a-Judge</span>
+    <span class="badge">Wazuh SIEM</span>
+    <span class="badge">Gemini · ChatGPT · Claude</span>
+    <span class="badge">κ ponderado · α Krippendorff</span>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">20</div>
+      <div class="stat-label">regras no dataset</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">3</div>
+      <div class="stat-label">modelos LLM</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">18</div>
+      <div class="stat-label">avaliações no piloto</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">93%</div>
+      <div class="stat-label">melhor acerto no piloto</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTEXTO -->
+<section class="bg-mid" id="contexto">
+  <div class="section-inner">
+    <p class="section-label">01 · Contexto</p>
+    <h2 class="section-title">O problema de segurança que motivou este projeto</h2>
+    <p class="section-body">Sistemas SIEM como o Wazuh monitoram redes e servidores por meio de regras de detecção — instruções que definem quando um comportamento é suspeito e deve gerar um alerta. A qualidade dessas regras determina diretamente a eficácia do monitoramento: uma regra mal configurada pode deixar passar ataques reais ou inundar analistas com falsos alarmes.</p>
+    <p class="section-body" style="margin-top:1rem;">A validação manual dessas regras é cara, lenta e dependente de especialistas escassos. Modelos de linguagem de grande porte (LLMs) surgem como candidatos naturais para automatizar ou apoiar essa avaliação — mas sua confiabilidade nessa tarefa técnica específica ainda não foi estudada.</p>
+
+    <div class="card-grid" style="margin-top:2.5rem;">
+      <div class="card">
+        <div class="card-icon">🛡️</div>
+        <div class="card-title">Wazuh SIEM</div>
+        <div class="card-text">Sistema open-source de detecção de intrusão amplamente adotado. As regras definem o que é anômalo e quanto risco cada evento representa.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">🤖</div>
+        <div class="card-title">LLM-as-a-Judge</div>
+        <div class="card-text">Paradigma em que modelos de linguagem atuam como avaliadores autônomos — aqui aplicado à avaliação técnica de regras de segurança.</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">📐</div>
+        <div class="card-title">Rubrica estruturada</div>
+        <div class="card-text">Cinco critérios ancorados (C1–C5) guiam a avaliação: estrutura, lógica, correlação, severidade e tratamento de ruído.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROPOSTA -->
+<section class="bg-dark" id="proposta">
+  <div class="section-inner">
+    <p class="section-label">02 · Proposta</p>
+    <h2 class="section-title">O que este projeto investiga</h2>
+    <p class="section-body">O projeto avalia experimentalmente a capacidade de três LLMs — Gemini, ChatGPT e Claude — de julgar a qualidade de regras Wazuh usando uma rubrica estruturada e um perfil organizacional como contexto. Três perguntas de pesquisa guiam o experimento.</p>
+
+    <div class="rq-list">
+      <div class="rq-item">
+        <span class="rq-num">RQ1</span>
+        <div class="rq-content">
+          <div class="rq-title">Concordância com o especialista humano</div>
+          <div class="rq-desc">O quanto o julgamento do LLM concorda com o de um especialista quando avaliam a mesma regra com a mesma rubrica?</div>
+          <div class="rq-metric">κ ponderado de Cohen</div>
+        </div>
+      </div>
+      <div class="rq-item">
+        <span class="rq-num">RQ2</span>
+        <div class="rq-content">
+          <div class="rq-title">Consistência entre modelos</div>
+          <div class="rq-desc">Gemini, ChatGPT e Claude chegam às mesmas conclusões quando avaliam a mesma regra independentemente?</div>
+          <div class="rq-metric">α de Krippendorff ordinal</div>
+        </div>
+      </div>
+      <div class="rq-item">
+        <span class="rq-num">RQ3</span>
+        <div class="rq-content">
+          <div class="rq-title">Capacidade de diagnóstico</div>
+          <div class="rq-desc">O modelo não só dá nota — ele consegue apontar onde está o defeito na regra e qual atributo XML está errado?</div>
+          <div class="rq-metric">Recall · Mutation score · Precisão</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight" style="margin-top:2rem;">
+      <strong>Condições experimentais:</strong> o experimento compara três cenários — E0 (sem contexto organizacional), E1 (com perfil ACME-LAB e rubrica) e E2 (E1 + estatísticas de histórico sem rótulo) — para medir quanto cada camada de contexto contribui para a qualidade do julgamento.
+    </div>
+  </div>
+</section>
+
+<!-- EVOLUÇÃO -->
+<section class="bg-mid" id="evolucao">
+  <div class="section-inner">
+    <p class="section-label">03 · Evolução</p>
+    <h2 class="section-title">Andamento do projeto no semestre</h2>
+    <p class="section-body">O projeto avançou em etapas incrementais, desde a definição do protocolo até a execução do piloto de calibração e o pré-registro formal.</p>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A1 — Definição do tema e escopo</span>
+        </div>
+        <div class="tl-desc">Escolha do tema de pesquisa: avaliação da qualidade de regras de detecção SIEM com LLMs. Alinhamento com o orientador e definição do foco nas regras Wazuh como objeto de estudo.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A2 — Revisão de literatura</span>
+        </div>
+        <div class="tl-desc">Levantamento do estado da arte em LLM-as-a-Judge, sistemas SIEM, regras Wazuh e métricas de concordância inter-avaliadores (κ de Cohen, α de Krippendorff). Identificação das lacunas de pesquisa.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A3 — Formulação das perguntas de pesquisa</span>
+        </div>
+        <div class="tl-desc">Definição das três RQs: concordância LLM × humano (RQ1), consistência entre modelos (RQ2) e capacidade de diagnóstico (RQ3). Escolha dos modelos Gemini, ChatGPT e Claude Sonnet como avaliadores.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A4 — Coleta de regras do SBSeg e análise inicial</span>
+        </div>
+        <div class="tl-desc">Coleta e análise das regras Wazuh geradas por LLM no estudo do SBSeg 2026. Identificação de problemas reais documentados com evidência empírica de replay de 1.000 eventos de segurança.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A5 — Perfil organizacional ACME-LAB</span>
+        </div>
+        <div class="tl-desc">Criação do perfil organizacional fictício ACME-LAB com 4 princípios de priorização (P1–P4) para contextualizar as avaliações. Definição da tabela de decisão de severidade C4.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A6 — Protocolo experimental inicial</span>
+        </div>
+        <div class="tl-desc">Definição das condições experimentais E0–E4, do formato do prompt E1 e da estrutura do schema JSON de saída. Primeiras versões da rubrica de avaliação e catálogo de defeitos.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A7 — Dataset estratificado</span>
+        </div>
+        <div class="tl-desc">20 regras Wazuh selecionadas em 4 categorias: nativas (N1–N6), geradas no SBSeg (S1–S6), mutantes com defeitos semeados (M1–M5) e controles sem defeito (C1–C3).</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A8 — Rubrica C1–C5 e protocolo inicial</span>
+        </div>
+        <div class="tl-desc">Cinco critérios ancorados com escala A/PA/I. Protocolo experimental definido com condições E0–E4 e plano de análise com κ ponderado e α de Krippendorff.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">A9–A11 — Correções P1–P11 e artefatos técnicos</span>
+        </div>
+        <div class="tl-desc">11 problemas corrigidos. Rubrica do avaliador separada, tabela de decisão C4, 6 regras de calibração, 20 XMLs do dataset, prompt E1 e catálogo de defeitos — todos publicados no repositório GitHub.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">Piloto de calibração — 3 LLMs × 6 regras</span>
+        </div>
+        <div class="tl-desc">18 avaliações executadas com Gemini, ChatGPT e Claude na condição E1. Ajustes na rubrica aplicados com base nos resultados. Dados registrados em evaluations.jsonl.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-header">
+          <span class="tl-tag done">✓ Concluído</span>
+          <span class="tl-title">Pré-registro com hash SHA-256</span>
+        </div>
+        <div class="tl-desc">Rubrica v1.1, prompt E1, catálogo, manifesto e tabela de decisão congelados com hashes de commit. Documento preregistration.md publicado em docs/.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot current"></div>
+        <div class="tl-header">
+          <span class="tl-tag current">→ Em andamento</span>
+          <span class="tl-title">Rotulação humana independente</span>
+        </div>
+        <div class="tl-desc">Dois avaliadores independentes e cegos rotularão as 20 regras. κ humano × humano será calculado antes da consolidação do padrão-ouro.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header">
+          <span class="tl-tag next">Próximo</span>
+          <span class="tl-title">Execução E0 + E1 + E2</span>
+        </div>
+        <div class="tl-desc">20 regras × 3 modelos × 3 repetições nas interfaces web. Resultados registrados em JSONL estruturado.</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-header">
+          <span class="tl-tag next">Próximo</span>
+          <span class="tl-title">Métricas e relatório</span>
+        </div>
+        <div class="tl-desc">κw, α, recall, mutation score e precisão. Tabelas e figuras para o artigo final.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- RESULTADOS -->
+<section class="bg-dark" id="resultados">
+  <div class="section-inner">
+    <p class="section-label">04 · Resultados Preliminares</p>
+    <h2 class="section-title">Piloto de calibração — primeiros dados</h2>
+    <p class="section-body">Antes do congelamento, os três modelos avaliaram as 6 regras de calibração na condição E1. Os resultados validam o protocolo e identificaram ajustes necessários na rubrica.</p>
+
+    <div class="results-grid">
+      <div class="result-card">
+        <div class="result-pct green">93%</div>
+        <div class="result-crit">Gemini 2.5 Flash</div>
+        <div class="result-desc">28 de 30 critérios avaliados corretamente</div>
+      </div>
+      <div class="result-card">
+        <div class="result-pct orange">87%</div>
+        <div class="result-crit">GPT-6 (ChatGPT)</div>
+        <div class="result-desc">26 de 30 critérios avaliados corretamente</div>
+      </div>
+      <div class="result-card">
+        <div class="result-pct orange">87%</div>
+        <div class="result-crit">Claude Sonnet 5.5</div>
+        <div class="result-desc">26 de 30 critérios avaliados corretamente</div>
+      </div>
+    </div>
+
+    <div style="margin-top:2rem;">
+      <p class="section-body" style="margin-bottom:1rem;">Acerto por critério de avaliação:</p>
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="result-pct green">100%</div>
+          <div class="result-crit">C4 — Severidade</div>
+          <div class="result-desc">Tabela de decisão P1–P4 validada pelos 3 modelos</div>
+        </div>
+        <div class="result-card">
+          <div class="result-pct green">94%</div>
+          <div class="result-crit">C1 — Estrutura</div>
+          <div class="result-desc">17 de 18 avaliações corretas</div>
+        </div>
+        <div class="result-card">
+          <div class="result-pct green">94%</div>
+          <div class="result-crit">C3 — Correlação</div>
+          <div class="result-desc">Instrução explícita na rubrica foi decisiva</div>
+        </div>
+        <div class="result-card">
+          <div class="result-pct yellow">83%</div>
+          <div class="result-crit">C2 — Lógica</div>
+          <div class="result-desc">Divergência em condições de negação simples</div>
+        </div>
+        <div class="result-card">
+          <div class="result-pct red">72%</div>
+          <div class="result-crit">C5 — Ruído</div>
+          <div class="result-desc">Maior divergência — ajustado na rubrica v1.1</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight">
+      <strong>Achado principal:</strong> na primeira rodada, nenhum modelo identificou o defeito da CAL-05 — uma janela de 30s implausível para brute force lento. Após uma instrução explícita de uma linha na rubrica, todos os três acertaram. Isso demonstra que a qualidade da instrução de avaliação tem impacto direto e mensurável no desempenho dos LLMs como juízes.
+    </div>
+
+    <a class="repo-card" href="https://github.com/Prykas/wazuh-judge" target="_blank" rel="noopener">
+      <span class="repo-icon">📁</span>
+      <div class="repo-info">
+        <div class="repo-name">github.com/Prykas/wazuh-judge</div>
+        <div class="repo-desc">Dataset, rubrica, prompts, regras de calibração, resultados do piloto e pré-registro — tudo público e reproduzível.</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-name">Priscila Schafhauzer</div>
+  <div class="footer-meta">
+    PPGES · UNIPAMPA · Laboratório de Inteligência Artificial Aplicada<br>
+    Orientador: Prof. Diego Kreutz<br>
+    <a href="mailto:priscilaschafhauzer.aluno@unipampa.edu.br">priscilaschafhauzer.aluno@unipampa.edu.br</a>
+    &nbsp;·&nbsp;
+    <a href="https://github.com/Prykas/wazuh-judge" target="_blank">github.com/Prykas/wazuh-judge</a>
+  </div>
+</footer>
+
+</body>
+</html>
