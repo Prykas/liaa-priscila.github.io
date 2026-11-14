@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Avaliação de Regras Wazuh</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy2:  #0D1F40;
+  --orange: #E8670A;
+  --white:  #FFFFFF;
+  --mono:   'JetBrains Mono', monospace;
+  --sans:   'Inter', sans-serif;
+  --surface: rgba(255,255,255,0.05);
+  --border:  rgba(255,255,255,0.09);
+  --muted:   rgba(255,255,255,0.5);
+  --text:    rgba(255,255,255,0.9);
+  --fs:      16px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: var(--fs); }
+body {
+  font-family: var(--sans);
+  background: var(--navy2);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* ── HEADER ── */
+header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(13,31,64,0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  height: 56px;
+  display: flex; align-items: center;
+  padding: 0 1.5rem; gap: 1.25rem;
+}
+.h-brand { font-size: 0.875rem; font-weight: 600; color: var(--orange); flex-shrink: 0; }
+.h-prog  { flex: 1; display: flex; align-items: center; gap: 0.75rem; }
+.prog-bar {
+  flex: 1; height: 5px; background: rgba(255,255,255,0.1);
+  border-radius: 999px; overflow: hidden; max-width: 220px;
+}
+.prog-fill { height: 100%; background: var(--orange); border-radius: 999px; transition: width 0.4s; }
+.prog-txt  { font-size: 0.8125rem; color: var(--muted); white-space: nowrap; }
+.h-nav { display: flex; gap: 0.35rem; flex-wrap: nowrap; overflow-x: auto; }
+.hn-btn {
+  width: 30px; height: 30px; border-radius: 6px;
+  font-size: 0.75rem; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface); color: var(--muted);
+  transition: all 0.15s; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.hn-btn:hover  { border-color: var(--orange); color: var(--orange); }
+.hn-btn.active { background: var(--orange); color: white; border-color: var(--orange); }
+.hn-btn.done   { border-color: rgba(74,222,128,0.5); color: #4ADE80; background: rgba(74,222,128,0.08); }
+
+/* ── MAIN ── */
+main {
+  flex: 1; padding: 72px 1rem 5.5rem;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+/* ── CARDS GENÉRICOS ── */
+.card {
+  width: 100%; max-width: 740px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* ── TELA INICIAL ── */
+.start-eyebrow {
+  font-size: 0.75rem; letter-spacing: 0.08em;
+  color: var(--orange); margin-bottom: 0.5rem; font-weight: 600;
+}
+.start-title { font-size: 1.375rem; font-weight: 700; margin-bottom: 0.5rem; }
+.start-sub   { font-size: 1rem; color: var(--muted); margin-bottom: 1.75rem; line-height: 1.65; }
+
+.how-title {
+  font-size: 0.875rem; font-weight: 700;
+  color: rgba(255,255,255,0.75); margin-bottom: 0.9rem;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.how-steps { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.75rem; }
+.how-step {
+  display: flex; gap: 0.9rem; align-items: flex-start;
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+  border-radius: 10px; padding: 0.9rem 1rem;
+}
+.how-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: rgba(232,103,10,0.15); border: 1px solid rgba(232,103,10,0.3);
+  color: var(--orange); font-size: 0.8125rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.how-text { font-size: 0.9375rem; line-height: 1.6; color: rgba(255,255,255,0.8); }
+.how-text strong { color: var(--white); }
+
+.scale-title {
+  font-size: 0.875rem; font-weight: 700;
+  color: rgba(255,255,255,0.75); margin-bottom: 0.9rem;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.scale-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1.75rem; }
+.scale-item {
+  border-radius: 8px; padding: 0.75rem 1rem;
+  font-size: 0.9375rem; line-height: 1.5;
+}
+.scale-A  { background: rgba(74,222,128,0.08);  border: 1px solid rgba(74,222,128,0.25); }
+.scale-PA { background: rgba(252,211,77,0.08);  border: 1px solid rgba(252,211,77,0.25); }
+.scale-I  { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.25); }
+.scale-NA { background: rgba(148,163,184,0.06); border: 1px solid rgba(148,163,184,0.2); }
+.scale-code { font-weight: 700; display: block; margin-bottom: 0.2rem; }
+.sc-A  { color: #4ADE80; }
+.sc-PA { color: #FCD34D; }
+.sc-I  { color: #F87171; }
+.sc-NA { color: #94A3B8; }
+.scale-desc { color: rgba(255,255,255,0.65); font-size: 0.875rem; }
+
+.info-box {
+  background: rgba(232,103,10,0.07); border: 1px solid rgba(232,103,10,0.2);
+  border-radius: 10px; padding: 1rem 1.1rem;
+  font-size: 0.9375rem; color: rgba(255,255,255,0.75);
+  line-height: 1.65; margin-bottom: 1.75rem;
+}
+.info-box strong { color: var(--white); }
+
+.id-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.field-label { font-size: 0.875rem; color: var(--muted); margin-bottom: 0.4rem; display: block; font-weight: 500; }
+.field-input {
+  width: 100%; background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.7rem 0.9rem; color: var(--white);
+  font-size: 1rem; font-family: var(--sans);
+}
+.field-input:focus { outline: none; border-color: rgba(232,103,10,0.5); }
+
+/* ── HEADER DA REGRA ── */
+.rule-meta { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.tag {
+  font-size: 0.8125rem; font-weight: 600;
+  padding: 0.25rem 0.7rem; border-radius: 999px; border: 1px solid;
+}
+.tag-id  { color: var(--orange); border-color: rgba(232,103,10,0.4); background: rgba(232,103,10,0.08); font-family: var(--mono); }
+.tag-cat { color: var(--muted); border-color: var(--border); }
+.tag-num { color: var(--muted); border-color: transparent; margin-left: auto; }
+
+.rule-desc   { font-size: 1.0625rem; font-weight: 600; margin-bottom: 0.6rem; line-height: 1.4; }
+.rule-parent { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.1rem; font-family: var(--mono); }
+.rule-parent span { color: rgba(255,255,255,0.7); }
+
+/* ── XML ── */
+.xml-wrap {
+  background: #07111F; border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: 1rem 1.1rem;
+  font-family: var(--mono); font-size: 0.875rem;
+  color: #8BAFD4; line-height: 1.8;
+  overflow-x: auto; white-space: pre; margin-bottom: 1.25rem;
+}
+
+/* ── RUBRICA ── */
+.rubric-btn {
+  width: 100%; text-align: left; cursor: pointer;
+  background: none; border: none; border-top: 1px solid var(--border);
+  padding: 0.85rem 0;
+  font-size: 0.9375rem; color: var(--muted); font-family: var(--sans);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: color 0.15s;
+}
+.rubric-btn:hover { color: var(--text); }
+.rubric-btn .arr { font-size: 0.75rem; transition: transform 0.2s; }
+.rubric-btn.open .arr { transform: rotate(180deg); }
+.rubric-panel { display: none; padding-bottom: 1rem; }
+.rubric-panel.open { display: block; }
+
+.r-crit {
+  margin-bottom: 0.9rem; padding: 0.9rem 1.1rem;
+  background: rgba(255,255,255,0.03);
+  border-left: 2px solid rgba(232,103,10,0.35);
+  border-radius: 0 8px 8px 0;
+}
+.r-crit-title { font-size: 0.875rem; font-weight: 700; color: var(--orange); margin-bottom: 0.5rem; font-family: var(--mono); }
+.r-crit-body  { font-size: 0.9375rem; color: rgba(255,255,255,0.65); line-height: 1.7; }
+.r-crit-body code {
+  font-family: var(--mono); background: rgba(255,255,255,0.08);
+  padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.875rem;
+}
+.r-note {
+  margin-top: 0.5rem; padding: 0.45rem 0.75rem;
+  background: rgba(232,103,10,0.07); border-radius: 5px;
+  font-size: 0.875rem; color: rgba(255,255,255,0.6);
+}
+
+/* ── CRITÉRIOS FORMULÁRIO ── */
+.criteria-section { margin-top: 1.5rem; }
+.crit-item {
+  margin-bottom: 1.5rem; padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.crit-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.crit-header { display: flex; align-items: baseline; gap: 0.65rem; margin-bottom: 0.4rem; }
+.crit-code {
+  font-family: var(--mono); font-size: 0.8125rem; font-weight: 700;
+  color: var(--orange); background: rgba(232,103,10,0.1);
+  padding: 0.15rem 0.55rem; border-radius: 4px;
+}
+.crit-name { font-size: 0.9375rem; font-weight: 600; }
+.crit-qdesc { font-size: 0.9rem; color: var(--muted); margin-bottom: 0.75rem; line-height: 1.55; }
+
+.opts { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.6rem; }
+.opt {
+  flex: 1; min-width: 80px;
+  padding: 0.65rem 0.5rem;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 0.9375rem; font-weight: 500; text-align: center;
+  cursor: pointer; transition: all 0.15s; color: var(--muted);
+  user-select: none; line-height: 1.3;
+}
+.opt:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+.opt.sel-A  { background: rgba(74,222,128,0.12);  border-color: rgba(74,222,128,0.5);  color: #4ADE80; }
+.opt.sel-PA { background: rgba(252,211,77,0.1);   border-color: rgba(252,211,77,0.5);  color: #FCD34D; }
+.opt.sel-I  { background: rgba(248,113,113,0.1);  border-color: rgba(248,113,113,0.5); color: #F87171; }
+.opt.sel-NA { background: rgba(148,163,184,0.08); border-color: rgba(148,163,184,0.3); color: #94A3B8; }
+
+.just-input {
+  width: 100%; background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 0.7rem 0.9rem; color: var(--text);
+  font-family: var(--sans); font-size: 1rem; line-height: 1.6;
+  resize: vertical; min-height: 56px; transition: border-color 0.15s;
+}
+.just-input:focus { outline: none; border-color: rgba(232,103,10,0.4); }
+.just-input::placeholder { color: rgba(255,255,255,0.2); }
+.just-label { font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem; display: block; }
+
+/* ── ALERTA ── */
+.alert {
+  display: none; margin-bottom: 1rem;
+  background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.3);
+  border-radius: 8px; padding: 0.75rem 1.1rem;
+  font-size: 0.9375rem; color: #F87171;
+  max-width: 740px; width: 100%;
+}
+.alert.show { display: block; }
+
+/* ── FOOTER ── */
+footer {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13,31,64,0.97); backdrop-filter: blur(10px);
+  border-top: 1px solid var(--border);
+  padding: 0.85rem 1.5rem env(safe-area-inset-bottom, 0px);
+  display: flex; gap: 0.75rem; justify-content: center; align-items: center;
+}
+.btn {
+  padding: 0.65rem 1.5rem; border-radius: 8px;
+  font-size: 0.9375rem; font-weight: 600; cursor: pointer;
+  border: none; transition: all 0.15s; font-family: var(--sans);
+}
+.btn-ghost   { background: none; color: var(--muted); border: 1px solid var(--border); }
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+.btn-primary { background: var(--orange); color: white; }
+.btn-primary:hover { background: #C4530A; }
+.btn-export  { background: rgba(74,222,128,0.12); color: #4ADE80; border: 1px solid rgba(74,222,128,0.3); }
+.btn-export:hover { background: rgba(74,222,128,0.2); }
+
+/* ── TELA CONCLUSÃO ── */
+.done-card { width: 100%; max-width: 480px; text-align: center; padding: 2.5rem 2rem; margin-top: 1.5rem; }
+.done-card .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.done-card h2 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+.done-card p  { font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.65; }
+
+/* ── MODAL ── */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; }
+.modal-bg.open { display: flex; }
+.modal-box { background: #122850; border: 1px solid rgba(232,103,10,0.25); border-radius: 14px; padding: 1.75rem; max-width: 580px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
+.modal-box h3 { font-size: 1rem; color: var(--orange); margin-bottom: 0.5rem; }
+.modal-box p  { font-size: 0.9375rem; color: var(--muted); margin-bottom: 0.9rem; line-height: 1.6; }
+.json-pre { flex: 1; overflow-y: auto; overflow-x: auto; background: #07111F; border-radius: 8px; padding: 1rem; font-family: var(--mono); font-size: 0.8125rem; color: #8BAFD4; white-space: pre; line-height: 1.6; max-height: 42vh; }
+.modal-actions { display: flex; gap: 0.75rem; margin-top: 1rem; justify-content: flex-end; }
+
+@media (max-width: 540px) {
+  .h-nav { display: none; }
+  .card { padding: 1.25rem; }
+  footer { flex-wrap: wrap; }
+  .opts { gap: 0.4rem; }
+  .opt { font-size: 0.875rem; min-width: 70px; }
+  .scale-grid { grid-template-columns: 1fr; }
+  .id-row { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="h-brand">wazuh-judge</span>
+  <div class="h-prog">
+    <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <span class="prog-txt" id="progTxt">0 / 20</span>
+  </div>
+  <div class="h-nav" id="hNav"></div>
+</header>
+
+<main id="main"></main>
+
+<div class="alert" id="alertBox">⚠ Selecione uma opção para todos os critérios antes de continuar.</div>
+
+<footer id="footer" style="display:none;">
+  <button class="btn btn-ghost" onclick="prev()">← Anterior</button>
+  <button class="btn btn-export" onclick="showExport()">Exportar JSON</button>
+  <button class="btn btn-primary" onclick="next()">Próxima →</button>
+</footer>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal-box">
+    <h3>Exportar avaliação</h3>
+    <p>Baixe o arquivo e envie à pesquisadora. Cada avaliador envia seu próprio arquivo JSON.</p>
+    <div class="json-pre" id="jsonPre"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeExport()">Fechar</button>
+      <button class="btn btn-ghost" onclick="copyJson()">Copiar</button>
+      <button class="btn btn-primary" onclick="dlJson()">⬇ Baixar arquivo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── RUBRICA v1.1 (sem âncoras) ───────────────────────────────────────────────
+const RUBRIC = [
+  {
+    key:"C1", name:"Correção Estrutural", naAllowed:false,
+    qdesc:"A regra está sintaticamente correta e carregaria no motor Wazuh sem erro?",
+    labels:{
+      A:"Carrega sem erro. Campos obrigatórios presentes. <code>frequency</code> e <code>timeframe</code> usados juntos quando um deles aparece. <code>if_sid</code> aponta para regra existente na cadeia fornecida.",
+      PA:"Carrega com inconsistência não-fatal: group incompleto, description genérica ou atributos redundantes sem impacto no carregamento.",
+      I:"Não carrega: XML inválido, <code>if_sid</code> inexistente na cadeia, <code>frequency</code> sem <code>timeframe</code> ou campo obrigatório ausente."
+    },
+    notes:[]
+  },
+  {
+    key:"C2", name:"Lógica de Correspondência", naAllowed:false,
+    qdesc:"As condições capturam o comportamento declarado, sem over-match nem under-match significativo?",
+    labels:{
+      A:"Condições capturam o comportamento declarado sem over-match ou under-match evidentes no contexto ACME-LAB.",
+      PA:"Correto para o caso principal, mas variantes razoáveis escapariam ou eventos legítimos específicos disparariam.",
+      I:"Captura tipo errado de evento; negação necessária ausente; lógica invertida; escopo excessivamente amplo."
+    },
+    notes:["Condições de negação simples (ex: <code>!root</code>, <code>!192.168.0.0/16</code>) que cobrem o universo declarado devem ser classificadas como <strong>A</strong>. Over-match existe apenas quando o escopo adicional não declarado é substancial e previsível no contexto ACME-LAB."]
+  },
+  {
+    key:"C3", name:"Correlação Temporal", naAllowed:true,
+    qdesc:"Se a regra usa frequency/timeframe/agrupamento, esses parâmetros são coerentes com o padrão de ataque descrito?",
+    labels:{
+      A:"frequency, timeframe e campos de agrupamento coerentes com o padrão alvo.",
+      PA:"Correlação faz sentido mas com ressalva: threshold ou janela levemente desalinhados com o padrão declarado.",
+      I:"Ausente quando o comportamento exige volume; ou parâmetros claramente inadequados para o padrão alvo.",
+      NA:"Regra de evento único com impacto imediato — correlação temporal não se aplica."
+    },
+    notes:[
+      "Uma janela muito curta para o padrão alvo é <strong>Inadequado</strong> — não Parcial. Ex: timeframe de 30s para um ataque descrito como lento ou de baixa intensidade.",
+      "Quando a descrição declara explicitamente <em>baixa intensidade</em> ou <em>lento</em>, avalie a janela contra esse padrão declarado."
+    ]
+  },
+  {
+    key:"C4", name:"Severidade", naAllowed:false,
+    qdesc:"O level está correto para o perfil ACME-LAB? Aplique a tabela de decisão abaixo.",
+    labels:{
+      A:"Level na faixa esperada pela tabela de decisão — distância 0.",
+      PA:"Level 1 faixa acima ou abaixo do esperado.",
+      I:"Level 2 ou mais faixas fora do esperado, ou contradiz explicitamente os princípios P1–P4."
+    },
+    notes:[
+      "<strong>Tabela de decisão:</strong> Base tentativa malsucedida = medium (5–8) · Base impacto efetivo = high (9–12) · Agravante P2 origem externa = +1 faixa · Agravante P3 volume/padrão = +1 faixa · Agravante P4 conta privilegiada = +1 faixa · Teto: critical.",
+      "<strong>Princípio P1:</strong> impacto efetivo (login bem-sucedido) pesa mais do que tentativa malsucedida — base já começa uma faixa acima."
+    ]
+  },
+  {
+    key:"C5", name:"Tratamento de Ruído", naAllowed:true,
+    qdesc:"A regra gera volume aceitável de falsos positivos no ambiente ACME-LAB?",
+    labels:{
+      A:"Baixo potencial de falsos positivos: condições específicas distinguem o anômalo do esperado.",
+      PA:"Pode gerar ruído em cenários previsíveis mas limitados — manutenção, erros de digitação, acessos legítimos pontuais.",
+      I:"Dispara em eventos claramente rotineiros sem mecanismo de supressão; volume esperado alto.",
+      NA:"Comportamento específico demais para estimar volume de falsos positivos pelo XML."
+    },
+    notes:[
+      "Regras com <code>low_priority</code> no group e escopo restrito (lista fechada de contas ou evento específico) têm potencial de ruído controlado — considere isso na avaliação.",
+      "Threshold baixo (ex: 3 falhas em 30s) pode gerar ruído por erros legítimos de digitação — classifique como PA se esse cenário for previsível no ambiente."
+    ]
+  }
+];
+
+// ── REGRAS ───────────────────────────────────────────────────────────────────
+const RULES = [
+  {id:"IT-01",cat:"N1 · Nativa",rid:"5715",desc:"sshd: authentication success",
+   parent:"5716 — sshd: authentication attempt",
+   xml:`<rule id="5715" level="3">
+  <if_sid>5716</if_sid>
+  <match>^Accepted</match>
+  <description>sshd: authentication success</description>
+  <group>authentication_success,pci_dss_10.2.5,</group>
+</rule>`},
+  {id:"IT-02",cat:"N2 · Nativa",rid:"5710",desc:"sshd: Attempt to login using a non-existent user",
+   parent:"5700 — sshd: attempt to login",
+   xml:`<rule id="5710" level="5">
+  <if_sid>5700</if_sid>
+  <match>illegal user|invalid user</match>
+  <description>sshd: Attempt to login using a non-existent user</description>
+  <group>invalid_login,authentication_failed,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-03",cat:"N3 · Nativa",rid:"5402",desc:"Successful sudo to ROOT executed",
+   parent:"5401 — PAM: su executed",
+   xml:`<rule id="5402" level="3">
+  <if_sid>5401</if_sid>
+  <match>COMMAND</match>
+  <regex>TTY=\\S+ ; PWD=\\S+ ; USER=root ; COMMAND=</regex>
+  <description>Successful sudo to ROOT executed</description>
+  <group>pci_dss_10.2.5,pci_dss_10.2.2,</group>
+</rule>`},
+  {id:"IT-04",cat:"N4 · Nativa",rid:"5403",desc:"First time user executed sudo",
+   parent:"5401 — PAM: su executed",
+   xml:`<rule id="5403" level="4">
+  <if_sid>5401</if_sid>
+  <match>COMMAND</match>
+  <description>First time user executed sudo</description>
+  <group>pci_dss_10.2.5,pci_dss_10.2.2,</group>
+</rule>`},
+  {id:"IT-05",cat:"N5 · Nativa",rid:"5501",desc:"PAM: Login session opened",
+   parent:"5500 — PAM: login event",
+   xml:`<rule id="5501" level="3">
+  <if_sid>5500</if_sid>
+  <match>session opened</match>
+  <description>PAM: Login session opened</description>
+  <group>pci_dss_10.2.5,</group>
+</rule>`},
+  {id:"IT-06",cat:"N6 · Nativa",rid:"40101",desc:"System user logged from external IP",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="40101" level="12">
+  <if_sid>5715</if_sid>
+  <match>^Accepted</match>
+  <user>^(?!root$)</user>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>System user logged from external IP</description>
+  <group>authentication_success,pci_dss_10.2.5,</group>
+</rule>`},
+  {id:"IT-07",cat:"S1 · SBSeg",rid:"100001",desc:"Falha SSH de IP externo fora faixas institucionais",
+   parent:"5716 — sshd: authentication failure",
+   xml:`<rule id="100001" level="10">
+  <if_sid>5716</if_sid>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Falha SSH de IP externo
+  fora faixas institucionais</description>
+  <group>authentication_failed,external_source,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-08",cat:"S2 · SBSeg",rid:"100003",desc:"Login SSH bem-sucedido de IP externo",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="100003" level="13">
+  <if_sid>5715</if_sid>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Login SSH bem-sucedido
+  de IP externo fora faixas institucionais</description>
+  <group>authentication_success,external_source,pci_dss_10.2.5,</group>
+</rule>`},
+  {id:"IT-09",cat:"S3 · SBSeg",rid:"100005",desc:"Brute force SSH baixa-e-lenta de IP externo",
+   parent:"100001 — Falha SSH IP externo",
+   xml:`<rule id="100005" level="10" frequency="10" timeframe="600">
+  <if_matched_sid>100001</if_matched_sid>
+  <description>Brute force SSH baixa-e-lenta
+  de IP externo</description>
+  <group>authentication_failed,brute_force,external_source,</group>
+</rule>`},
+  {id:"IT-10",cat:"S4 · SBSeg",rid:"100007",desc:"Credential stuffing — falha seguida de sucesso de IP externo",
+   parent:"100001 — Falha SSH IP externo | 5715 — sshd: authentication success",
+   xml:`<rule id="100007" level="14">
+  <if_matched_sid>100001</if_matched_sid>
+  <if_sid>5715</if_sid>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Credential stuffing: falha seguida
+  de sucesso de IP externo</description>
+  <group>authentication_success,brute_force,external_source,</group>
+</rule>`},
+  {id:"IT-11",cat:"S5 · SBSeg",rid:"100010",desc:"Tentativa de login root de IP externo",
+   parent:"5716 — sshd: authentication failure",
+   xml:`<rule id="100010" level="13">
+  <if_sid>5716</if_sid>
+  <match>root</match>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Tentativa de login root
+  de IP externo fora faixas institucionais</description>
+  <group>authentication_failed,external_source,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-12",cat:"S6 · SBSeg",rid:"100021",desc:"Login interativo em conta de sistema sem shell",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="100021" level="14">
+  <if_sid>5715</if_sid>
+  <user>daemon|nobody|www-data|mysql|postgres|
+        redis|mongodb|elasticsearch</user>
+  <description>Login interativo em conta
+  de sistema sem shell</description>
+  <group>authentication_success,privilege_escalation,</group>
+</rule>`},
+  {id:"IT-13",cat:"M1 · Mutante",rid:"100001",desc:"Falha SSH de IP externo fora faixas institucionais",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="100001" level="10">
+  <if_sid>5715</if_sid>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Falha SSH de IP externo
+  fora faixas institucionais</description>
+  <group>authentication_failed,external_source,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-14",cat:"M2 · Mutante",rid:"100005",desc:"Brute force SSH baixa-e-lenta de IP externo",
+   parent:"100001 — Falha SSH IP externo",
+   xml:`<rule id="100005" level="10" frequency="10" timeframe="600">
+  <if_matched_sid>100001</if_matched_sid>
+  <description>Brute force SSH baixa-e-lenta
+  de IP externo</description>
+  <group>authentication_failed,brute_force,external_source,</group>
+</rule>`},
+  {id:"IT-15",cat:"M3 · Mutante",rid:"100005",desc:"Brute force SSH baixa-e-lenta de IP externo",
+   parent:"100001 — Falha SSH IP externo",
+   xml:`<rule id="100005" level="10" frequency="10" timeframe="60">
+  <if_matched_sid>100001</if_matched_sid>
+  <same_srcip />
+  <description>Brute force SSH baixa-e-lenta
+  de IP externo</description>
+  <group>authentication_failed,brute_force,external_source,</group>
+</rule>`},
+  {id:"IT-16",cat:"M4 · Mutante",rid:"100010",desc:"Tentativa de login root de IP externo",
+   parent:"5716 — sshd: authentication failure",
+   xml:`<rule id="100010" level="5">
+  <if_sid>5716</if_sid>
+  <match>root</match>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <description>Tentativa de login root
+  de IP externo fora faixas institucionais</description>
+  <group>authentication_failed,external_source,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-17",cat:"M5 · Mutante",rid:"100001",desc:"Falha SSH de IP externo fora faixas institucionais",
+   parent:"5716 — sshd: authentication failure",
+   xml:`<rule id="100001" level="10">
+  <if_sid>5716</if_sid>
+  <srcip>192.168.0.0/16</srcip>
+  <srcip>10.0.0.0/8</srcip>
+  <srcip>172.16.0.0/12</srcip>
+  <description>Falha SSH de IP externo
+  fora faixas institucionais</description>
+  <group>authentication_failed,external_source,pci_dss_10.2.4,</group>
+</rule>`},
+  {id:"IT-18",cat:"C1 · Controle",rid:"100003",desc:"Login SSH de usuário comum de IP externo",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="100003" level="13">
+  <if_sid>5715</if_sid>
+  <srcip>!192.168.0.0/16</srcip>
+  <srcip>!10.0.0.0/8</srcip>
+  <srcip>!172.16.0.0/12</srcip>
+  <user>!root</user>
+  <description>Login SSH de usuario comum
+  de IP externo fora faixas institucionais</description>
+  <group>authentication_success,external_source,pci_dss_10.2.5,</group>
+</rule>`},
+  {id:"IT-19",cat:"C2 · Controle",rid:"100021",desc:"Login interativo em conta de sistema sem shell",
+   parent:"5715 — sshd: authentication success",
+   xml:`<rule id="100021" level="14">
+  <if_sid>5715</if_sid>
+  <user>daemon|nobody|www-data|mysql|postgres|
+        redis|mongodb|elasticsearch</user>
+  <description>Login interativo em conta
+  de sistema sem shell</description>
+  <group>authentication_success,privilege_escalation,</group>
+</rule>`},
+  {id:"IT-20",cat:"C3 · Controle",rid:"100008",desc:"Password spraying — múltiplas origens, mesmo usuário",
+   parent:"5716 — sshd: authentication failure",
+   xml:`<rule id="100008" level="12" frequency="6" timeframe="600">
+  <if_matched_sid>5716</if_matched_sid>
+  <same_user />
+  <different_srcip />
+  <description>Password spraying SSH: multiplas falhas
+  no mesmo usuario de origens distintas</description>
+  <group>authentication_failed,brute_force,pci_dss_10.2.4,</group>
+</rule>`}
+];
+
+// ── ESTADO ───────────────────────────────────────────────────────────────────
+let state="start", cur=0, avaliador="", dataAval="";
+const ans = Array(20).fill(null).map(()=>({
+  C1:null,C2:null,C3:null,C4:null,C5:null,
+  C1j:"",C2j:"",C3j:"",C4j:"",C5j:""
+}));
+
+function boot(){
+  buildNav();
+  showStart();
+}
+
+function buildNav(){
+  const nav=document.getElementById("hNav");
+  RULES.forEach((_,i)=>{
+    const b=document.createElement("button");
+    b.className="hn-btn"; b.id=`nb${i}`; b.textContent=i+1;
+    b.onclick=()=>{ if(state==="eval") goTo(i); };
+    nav.appendChild(b);
+  });
+}
+
+function updateNav(){
+  RULES.forEach((_,i)=>{
+    const b=document.getElementById(`nb${i}`);
+    b.className="hn-btn";
+    if(i===cur) b.classList.add("active");
+    else if(isDone(i)) b.classList.add("done");
+  });
+  const done=ans.filter((_,i)=>isDone(i)).length;
+  document.getElementById("progFill").style.width=(done/20*100)+"%";
+  document.getElementById("progTxt").textContent=`${done} / 20`;
+}
+
+function isDone(i){ return RUBRIC.every(c=>ans[i][c.key]!==null); }
+
+// ── TELA INICIAL ─────────────────────────────────────────────────────────────
+function showStart(){
+  state="start";
+  document.getElementById("footer").style.display="none";
+  document.getElementById("main").innerHTML=`
+  <div class="card" style="max-width:680px;margin-top:1rem;">
+    <div class="start-eyebrow">PPGES · UNIPAMPA · LIAA</div>
+    <div class="start-title">Avaliação de Regras Wazuh</div>
+    <div class="start-sub">Esta ferramenta faz parte de um estudo de mestrado sobre a qualidade de regras de detecção SIEM. Você avaliará <strong>20 regras Wazuh</strong> de forma independente, utilizando uma rubrica estruturada de 5 critérios.</div>
+
+    <div class="how-title">Como avaliar</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-text">Leia o <strong>XML da regra</strong> e a <strong>cadeia de regras pai</strong> indicada acima do XML — o contexto hierárquico é parte essencial da análise.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-text">Avalie cada um dos <strong>5 critérios</strong> (C1 a C5) de forma independente. Para cada um, selecione o rótulo que melhor representa sua análise.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-text">A <strong>justificativa é opcional</strong>, mas se identificar um problema específico, descreva brevemente o atributo XML envolvido e o motivo da classificação.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-text">Se precisar consultar as definições dos critérios, clique em <strong>"Ver rubrica"</strong> dentro de cada regra. Avalie sem pressa — não há tempo limite.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">5</div>
+        <div class="how-text">Ao concluir todas as 20 regras, <strong>exporte o arquivo JSON</strong> e envie à pesquisadora. Cada avaliador envia seu próprio arquivo.</div>
+      </div>
+    </div>
+
+    <div class="scale-title">Escala de classificação</div>
+    <div class="scale-grid">
+      <div class="scale-item scale-A">
+        <span class="scale-code sc-A">A — Adequado</span>
+        <span class="scale-desc">O critério é plenamente atendido. Nenhuma ressalva significativa.</span>
+      </div>
+      <div class="scale-item scale-PA">
+        <span class="scale-code sc-PA">PA — Parcialmente Adequado</span>
+        <span class="scale-desc">Atendido em parte. Há uma limitação real, mas não inviabiliza a regra.</span>
+      </div>
+      <div class="scale-item scale-I">
+        <span class="scale-code sc-I">I — Inadequado</span>
+        <span class="scale-desc">O critério não é atendido. Há um defeito que compromete a regra.</span>
+      </div>
+      <div class="scale-item scale-NA">
+        <span class="scale-code sc-NA">NA — Não Aplicável</span>
+        <span class="scale-desc">O critério não se aplica à regra. Disponível apenas em C3 e C5.</span>
+      </div>
+    </div>
+
+    <div class="info-box">
+      ⚠ <strong>Importante:</strong> avalie cada regra de forma independente, sem considerar o que avaliou nas anteriores. Não consulte fontes externas durante a avaliação — o objetivo é capturar seu julgamento técnico com base no XML e nas definições da rubrica.
+    </div>
+
+    <div class="id-row">
+      <div>
+        <label class="field-label">Seu nome ou código de avaliador</label>
+        <input class="field-input" id="inNome" placeholder="Ex: Avaliador-1" value="${avaliador}">
+      </div>
+      <div>
+        <label class="field-label">Data de hoje</label>
+        <input class="field-input" id="inData" type="date" value="${dataAval||new Date().toISOString().slice(0,10)}">
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="startEval()">Iniciar avaliação →</button>
+  </div>`;
+}
+
+function startEval(){
+  avaliador=document.getElementById("inNome").value.trim()||"nao-informado";
+  dataAval=document.getElementById("inData").value||new Date().toISOString().slice(0,10);
+  state="eval";
+  document.getElementById("footer").style.display="flex";
+  goTo(0);
+}
+
+// ── RENDER REGRA ─────────────────────────────────────────────────────────────
+function goTo(i){
+  cur=i; hideAlert();
+  const r=RULES[i], a=ans[i];
+
+  const rubric=`
+    <button class="rubric-btn" id="rubBtn" onclick="toggleRubric()">
+      📋 Ver rubrica de avaliação (C1–C5) <span class="arr">▼</span>
+    </button>
+    <div class="rubric-panel" id="rubPanel">
+      ${RUBRIC.map(c=>`
+        <div class="r-crit">
+          <div class="r-crit-title">${c.key} — ${c.name}</div>
+          <div class="r-crit-body">
+            ${Object.entries(c.labels).map(([l,v])=>`<strong>${l}:</strong> ${v}<br>`).join("")}
+            ${c.notes.map(n=>`<div class="r-note">⚠ ${n}</div>`).join("")}
+          </div>
+        </div>`).join("")}
+    </div>`;
+
+  const crits=RUBRIC.map(c=>{
+    const opts=c.naAllowed?["A","PA","I","NA"]:["A","PA","I"];
+    const lbl={A:"✓ Adequado",PA:"△ Parcial",I:"✗ Inadequado",NA:"— N/A"};
+    return `
+      <div class="crit-item">
+        <div class="crit-header">
+          <span class="crit-code">${c.key}</span>
+          <span class="crit-name">${c.name}</span>
+        </div>
+        <div class="crit-qdesc">${c.qdesc}</div>
+        <div class="opts" id="opts_${c.key}">
+          ${opts.map(o=>`
+            <div class="opt${a[c.key]===o?' sel-'+o:''}" onclick="pick('${c.key}','${o}',this)">
+              ${lbl[o]}
+            </div>`).join("")}
+        </div>
+        <label class="just-label">Justificativa <span style="opacity:.5;">(opcional)</span></label>
+        <textarea class="just-input" id="just_${c.key}"
+          placeholder="Se identificou um problema, cite o atributo XML e o motivo"
+          oninput="saveJust('${c.key}',this.value)">${a[c.key+'j']||''}</textarea>
+      </div>`;
+  }).join("");
+
+  document.getElementById("main").innerHTML=`
+    <div class="card">
+      <div class="rule-meta">
+        <span class="tag tag-id">${r.id}</span>
+        <span class="tag tag-cat">${r.cat}</span>
+        <span class="tag tag-cat">rule_id ${r.rid}</span>
+        <span class="tag tag-num">${i+1} / 20</span>
+      </div>
+      <div class="rule-desc">${r.desc}</div>
+      <div class="rule-parent">↳ Pai: <span>${r.parent}</span></div>
+      <div class="xml-wrap">${esc(r.xml)}</div>
+      ${rubric}
+      <div class="criteria-section">${crits}</div>
+    </div>`;
+
+  updateNav();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function toggleRubric(){
+  const btn=document.getElementById("rubBtn");
+  const panel=document.getElementById("rubPanel");
+  const open=panel.classList.toggle("open");
+  btn.classList.toggle("open",open);
+}
+
+function pick(key,val,el){
+  ans[cur][key]=val;
+  document.querySelectorAll(`#opts_${key} .opt`).forEach(o=>o.className="opt");
+  el.className=`opt sel-${val}`;
+  updateNav(); hideAlert();
+}
+
+function saveJust(key,val){ ans[cur][key+"j"]=val; }
+function prev(){ if(cur>0) goTo(cur-1); }
+function next(){
+  if(!isDone(cur)){ showAlert(); return; }
+  hideAlert();
+  if(cur<19) goTo(cur+1); else showDone();
+}
+function showAlert(){ document.getElementById("alertBox").classList.add("show"); }
+function hideAlert(){ document.getElementById("alertBox").classList.remove("show"); }
+
+function showDone(){
+  state="done";
+  document.getElementById("main").innerHTML=`
+    <div class="done-card">
+      <div class="icon">✅</div>
+      <h2>Avaliação concluída!</h2>
+      <p>Todas as 20 regras foram avaliadas. Exporte o arquivo JSON e envie à pesquisadora.</p>
+      <button class="btn btn-export" style="width:100%;margin-bottom:0.75rem;" onclick="showExport()">⬇ Exportar arquivo JSON</button>
+      <button class="btn btn-ghost" style="width:100%;" onclick="goTo(0)">Revisar avaliações</button>
+    </div>`;
+  updateNav();
+}
+
+function buildJson(){
+  return JSON.stringify({
+    avaliador, data:dataAval,
+    evaluations:RULES.map((r,i)=>({
+      item_id:r.id, avaliador, data:dataAval, condition:"E1",
+      scores:{C1:ans[i].C1,C2:ans[i].C2,C3:ans[i].C3,C4:ans[i].C4,C5:ans[i].C5},
+      justificativas:{C1:ans[i].C1j,C2:ans[i].C2j,C3:ans[i].C3j,C4:ans[i].C4j,C5:ans[i].C5j}
+    }))
+  },null,2);
+}
+
+function showExport(){
+  document.getElementById("jsonPre").textContent=buildJson();
+  document.getElementById("modalBg").classList.add("open");
+}
+function closeExport(){ document.getElementById("modalBg").classList.remove("open"); }
+function copyJson(){ navigator.clipboard.writeText(buildJson()).then(()=>alert("Copiado!")); }
+function dlJson(){
+  const nome=avaliador.replace(/\s+/g,"-");
+  const blob=new Blob([buildJson()],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`avaliacao-${nome}-${dataAval}.json`;
+  a.click();
+}
+
+boot();
+</script>
+</body>
+</html>
